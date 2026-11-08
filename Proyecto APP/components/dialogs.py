@@ -36,7 +36,7 @@ def mostrar_formulario_movimiento(
         value=monto_inicial,
         prefix="$ ",
         keyboard_type=ft.KeyboardType.NUMBER,
-        border_radius=10,
+        border=ft.OutlineInputBorder(border_radius=10),
         autofocus=True,
     )
 
@@ -51,7 +51,7 @@ def mostrar_formulario_movimiento(
     campo_desc = ft.TextField(
         label="Descripción (opcional)",
         value=desc_inicial,
-        border_radius=10,
+        border=ft.OutlineInputBorder(border_radius=10),
     )
 
     btn_fecha = ft.OutlinedButton(

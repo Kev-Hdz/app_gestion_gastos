@@ -2,16 +2,19 @@ import flet as ft
 from models.movimiento import moneda
 
 
-def crear_tarjeta_balance(balance: float) -> ft.Container:
-    """Genera la tarjeta principal de balance financiero."""
-    color_balance = ft.Colors.WHITE if balance >= 0 else ft.Colors.RED_100
-    signo = "" if balance >= 0 else "-"
+def crear_tarjeta_balance(balance: float, etiqueta: str = "Balance actual") -> ft.Container:
+    """Genera la tarjeta principal de balance financiero adaptada al período."""
+    es_positivo = balance >= 0
+    color_balance = ft.Colors.WHITE if es_positivo else ft.Colors.RED_100
+    color_fondo = ft.Colors.GREEN_700 if es_positivo else ft.Colors.RED_800
+    icono_balance = ft.Icons.ACCOUNT_BALANCE_WALLET if es_positivo else ft.Icons.WARNING_ROUNDED
+    signo = "" if es_positivo else "-"
     balance_abs = abs(balance)
 
     return ft.Container(
         padding=22,
         border_radius=18,
-        bgcolor=ft.Colors.TEAL_700,
+        bgcolor=color_fondo,
         shadow=ft.BoxShadow(
             spread_radius=1,
             blur_radius=12,
@@ -24,8 +27,8 @@ def crear_tarjeta_balance(balance: float) -> ft.Container:
                 ft.Row(
                     alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
                     controls=[
-                        ft.Text("Balance actual", color=ft.Colors.WHITE_70, size=14, weight=ft.FontWeight.W_500),
-                        ft.Icon(ft.Icons.ACCOUNT_BALANCE_WALLET, color=ft.Colors.WHITE_70, size=20),
+                        ft.Text(etiqueta, color=ft.Colors.WHITE_70, size=14, weight=ft.FontWeight.W_500),
+                        ft.Icon(icono_balance, color=ft.Colors.WHITE_70, size=20),
                     ],
                 ),
                 ft.Text(
@@ -87,7 +90,7 @@ def crear_tarjetas_resumen(ingresos: float, gastos: float) -> ft.Row:
                 icono=ft.Icons.ARROW_UPWARD,
                 color_icono=ft.Colors.GREEN_700,
                 bgcolor_icono=ft.Colors.GREEN_50,
-                color_texto=ft.Colors.GREEN_700,
+                color_texto=ft.Colors.BLACK,
             ),
             _mini_tarjeta(
                 titulo="Gastos",
@@ -95,7 +98,7 @@ def crear_tarjetas_resumen(ingresos: float, gastos: float) -> ft.Row:
                 icono=ft.Icons.ARROW_DOWNWARD,
                 color_icono=ft.Colors.RED_700,
                 bgcolor_icono=ft.Colors.RED_50,
-                color_texto=ft.Colors.RED_700,
+                color_texto=ft.Colors.BLACK,
             ),
         ],
     )

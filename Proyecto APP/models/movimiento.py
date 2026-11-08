@@ -4,7 +4,7 @@ from typing import Optional
 import flet as ft
 
 CATEGORIAS_GASTO = [
-    "Comida", "Transporte", "Escuela", "Entretenimiento",
+    "Comida", "Despensa", "Transporte", "Escuela", "Entretenimiento",
     "Salud", "Ropa", "Servicios", "Otros",
 ]
 
@@ -14,6 +14,7 @@ CATEGORIAS_INGRESO = [
 
 ICONOS = {
     "Comida": ft.Icons.RESTAURANT,
+    "Despensa": ft.Icons.LOCAL_GROCERY_STORE,
     "Transporte": ft.Icons.DIRECTIONS_BUS,
     "Escuela": ft.Icons.SCHOOL,
     "Entretenimiento": ft.Icons.MOVIE,

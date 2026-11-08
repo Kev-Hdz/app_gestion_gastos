@@ -96,7 +96,7 @@ Proyecto APP/
     - **Clase `Movimiento`**: Definida mediante `@dataclass`, encapsula los campos de una transacción (`id`, `tipo`, `categoria`, `descripcion`, `monto`, `fecha`).
     - **Método `from_row(row)`**: Método de fábrica (Factory Method) que convierte una tupla devuelta por SQLite en una instancia de `Movimiento`.
     - **Constantes de configuración**:
-      - `CATEGORIAS_GASTO`: Lista con opciones ("Comida", "Transporte", "Escuela", "Entretenimiento", "Salud", "Ropa", "Servicios", "Otros").
+      - `CATEGORIAS_GASTO`: Lista con opciones ("Comida", "Despensa", "Transporte", "Escuela", "Entretenimiento", "Salud", "Ropa", "Servicios", "Otros").
       - `CATEGORIAS_INGRESO`: Lista con opciones ("Sueldo", "Beca", "Ventas", "Regalo", "Otros").
       - `ICONOS`: Mapeo de cada categoría con su correspondiente ícono de Material Design (`ft.Icons.*`).
     - **Función `moneda(valor)`**: Formatea valores numéricos a cadena de moneda (ejemplo: `$1,500.00`).
@@ -108,8 +108,10 @@ Proyecto APP/
 - **Propósito**: Mantener la interfaz limpia separando los componentes gráficos secundarios (tarjetas, ítems de lista y modales) de las vistas principales.
 - **Archivos**:
   - `cards.py`:
-    - `crear_tarjeta_balance(balance)`: Tarjeta principal con fondo `Teal`, sombra y texto grande que resalta el saldo actual (con indicación especial si el balance es negativo).
+    - `crear_tarjeta_balance(balance, etiqueta)`: Tarjeta principal con fondo `Teal`/`Verde` (o rojo si es negativo), sombra y texto grande que resalta el saldo del período seleccionado.
     - `crear_tarjetas_resumen(ingresos, gastos)`: Dos mini tarjetas comparativas que muestran ingresos en verde con flecha ascendente y gastos en rojo con flecha descendente.
+  - `variance_chart.py`:
+    - `crear_tarjeta_grafica_varianza(datos_flujo, periodo_texto)`: Gráfica vectorial Canvas nativa ampliada que visualiza el flujo general de **Ingresos (verde)** vs **Gastos (rojo)** con modos de barras comparativas y curvas continuas, sin leyendas intrusivas de picos y con interpretación en lenguaje claro.
   - `movement_item.py`:
     - `crear_item_movimiento(mov, on_edit, on_delete)`: Tarjeta individual que muestra cada transacción: ícono de categoría coloreado, título o descripción, fecha formateada, monto con signo `+/-` y botones rápidos para editar y eliminar.
   - `dialogs.py`:
@@ -123,16 +125,14 @@ Proyecto APP/
 - **Propósito**: Representar las pantallas completas del sistema que se montan en el contenedor principal. Heredan de `ft.Column` con scroll automático (`scroll=ft.ScrollMode.AUTO`).
 - **Archivos**:
   - `dashboard_view.py` (`DashboardView`):
-    - **Inicio**: Muestra la tarjeta del balance global, las tarjetas de flujo de ingresos/gastos y los 5 movimientos más recientes.
+    - **Inicio**: Muestra selector de período (Todos, 15 días, 30 días), tarjeta de balance dinámico, tarjetas de flujo de ingresos/gastos y movimientos recientes del período.
     - Incluye un botón rápido _"Ver todos"_ que redirige al historial.
     - Cuenta con un estado visual vacío cuando no hay transacciones.
   - `historial_view.py` (`HistorialView`):
-    - **Historial Completo**: Lista todas las transacciones sin límite.
-    - Incorpora un buscador en tiempo real (`TextField`) con filtrado por categoría o texto.
-    - Segmented button para alternar entre "Todos", "Gastos" e "Ingresos".
+    - **Historial Completo**: Lista transacciones con filtros por tipo (Todos/Gastos/Ingresos), ventana de tiempo (Todo/15 días/30 días) y buscador de texto en tiempo real.
     - Contador dinámico de resultados encontrados y mensaje ilustrativo si no hay coincidencias.
   - `estadisticas_view.py` (`EstadisticasView`):
-    - **Análisis de Gastos**: Muestra el gasto total acumulado y un desglose categoría por categoría con barras de progreso porcentuales (`ProgressBar`), montos totales y conteo de gastos.
+    - **Análisis de Gastos y Flujo**: Muestra selector de período, tarjeta de gasto total, **gráfica vectorial ampliada de flujo financiero (Ingresos vs Gastos)**, y desglose categoría por categoría con barras de progreso porcentuales (`ProgressBar`).
 
 ---
 

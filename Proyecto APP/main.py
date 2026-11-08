@@ -2,9 +2,11 @@
 Control de Gastos - Finanzas Personales
 Aplicación multiplataforma modular construida con Flet y SQLite.
 Permite registrar ingresos y gastos, persistencia local segura,
-análisis estadístico por categoría y exploración de historial con filtros.
+análisis estadístico con picos y varianza (Gastos vs Comida),
+y visualización temporal dinámica (15 y 30 días) ajustando el balance.
 """
 
+from typing import Optional
 import flet as ft
 from database.db_manager import DBManager
 from models.movimiento import Movimiento
@@ -27,16 +29,28 @@ def main(page: ft.Page):
     # Inicialización de la base de datos local SQLite
     db = DBManager()
 
+    # Estado global del período activo (None = Todos, 15 = 15 días, 30 = 30 días)
+    periodo_global = [None]
+
     def avisar(mensaje: str, color=ft.Colors.TEAL_700):
         """Muestra una notificación emergente SnackBar."""
         page.show_dialog(ft.SnackBar(ft.Text(mensaje), bgcolor=color))
 
     def refrescar_todo():
-        """Sincroniza los datos en todas las vistas montadas."""
-        vista_dashboard.actualizar_datos()
-        vista_historial.actualizar_datos()
-        vista_estadisticas.actualizar_datos()
+        """Sincroniza los datos en todas las vistas montadas con el período activo."""
+        dias = periodo_global[0]
+        vista_dashboard.actualizar_datos(dias)
+        vista_historial.actualizar_datos(dias)
+        vista_estadisticas.actualizar_datos(dias)
         page.update()
+
+    def al_cambiar_periodo_global(dias: Optional[int]):
+        """Sincroniza el cambio de período entre todas las vistas de la aplicación."""
+        periodo_global[0] = dias
+        vista_dashboard.establecer_periodo(dias)
+        vista_historial.establecer_periodo(dias)
+        vista_estadisticas.establecer_periodo(dias)
+        refrescar_todo()
 
     def on_guardado(mensaje: str):
         """Callback al agregar o editar un movimiento con éxito."""
@@ -66,27 +80,32 @@ def main(page: ft.Page):
         nav_bar.selected_index = 1
         cambiar_vista(1)
 
-    # Creación de vistas desacopladas
+    # Creación de vistas desacopladas con soporte para sincronización de período
     vista_dashboard = DashboardView(
         db=db,
         on_edit=on_editar,
         on_delete=on_eliminar,
         on_ver_todos=ir_a_historial,
+        on_cambiar_periodo=al_cambiar_periodo_global,
     )
     vista_historial = HistorialView(
         db=db,
         on_edit=on_editar,
         on_delete=on_eliminar,
+        on_cambiar_periodo=al_cambiar_periodo_global,
     )
-    vista_estadisticas = EstadisticasView(db=db)
+    vista_estadisticas = EstadisticasView(
+        db=db,
+        on_cambiar_periodo=al_cambiar_periodo_global,
+    )
 
     vistas = [vista_dashboard, vista_historial, vista_estadisticas]
     contenedor_principal = ft.Container(content=vista_dashboard, expand=True)
 
     def cambiar_vista(indice: int):
-        """Conmuta la vista visible en el contenedor principal."""
+        """Conmuta la vista visible en el contenedor principal asegurando datos actualizados."""
         contenedor_principal.content = vistas[indice]
-        vistas[indice].actualizar_datos()
+        vistas[indice].actualizar_datos(periodo_global[0])
         page.update()
 
     # Barra de navegación inferior (Material 3 NavigationBar)

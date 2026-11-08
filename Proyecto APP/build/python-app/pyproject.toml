@@ -1,0 +1,17 @@
+[project]
+name = "control_de_gastos"
+version = "1.0.0"
+description = "Control de Gastos - Finanzas Personales"
+dependencies = [
+    "flet==1.0.3",
+]
+
+[tool.flet]
+product = "Control de Gastos"
+org = "com.controldegastos"
+
+[tool.flet.android]
+split_per_abi = true
+
+[tool.flet.flutter.pubspec.dependency_overrides]
+jni = "^1.1.0"
