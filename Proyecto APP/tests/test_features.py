@@ -2,10 +2,12 @@ import unittest
 import os
 import tempfile
 from datetime import datetime, timedelta
+from pathlib import Path
+import sys
 import flet as ft
 
-import sys
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# Ruta raíz portable usando pathlib
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from models.movimiento import Movimiento, CATEGORIAS_GASTO, ICONOS
 from database.db_manager import DBManager
@@ -19,7 +21,7 @@ from views.estadisticas_view import EstadisticasView
 class TestMejoras(unittest.TestCase):
     def setUp(self):
         self.temp_dir = tempfile.TemporaryDirectory(ignore_cleanup_errors=True)
-        self.db_path = os.path.join(self.temp_dir.name, "test_gastos.db")
+        self.db_path = str(Path(self.temp_dir.name) / "test_gastos.db")
         self.db = DBManager(db_path=self.db_path)
 
     def tearDown(self):

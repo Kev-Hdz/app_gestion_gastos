@@ -1,0 +1,19 @@
+# Archivos y carpetas de compilación
+apks_generados/
+build/
+dist/
+*.apk
+*.aab
+
+# Entornos virtuales y caché de Python
+venv/
+.venv/
+env/
+__pycache__/
+*.pyc
+
+# Archivos del sistema y de editores
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

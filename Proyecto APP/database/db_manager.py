@@ -1,5 +1,8 @@
 import sqlite3
 import os
+import sys
+import shutil
+from pathlib import Path
 from datetime import datetime, timedelta
 from typing import Optional, List, Dict, Any
 from models.movimiento import Movimiento
@@ -13,14 +16,29 @@ class DBManager:
             # En dispositivos móviles (Android/iOS), Flet expone FLET_APP_STORAGE_DATA
             storage_data = os.getenv("FLET_APP_STORAGE_DATA")
             if storage_data:
-                data_dir = storage_data
+                data_dir = Path(storage_data)
+            elif getattr(sys, "frozen", False):
+                # Soporte para ejecutable empaquetado con PyInstaller: persistir en directorio del binario
+                exe_dir = Path(sys.executable).resolve().parent
+                data_dir = exe_dir / "data"
+                data_dir.mkdir(parents=True, exist_ok=True)
+                target_db = data_dir / "gastos.db"
+                # Si la base de datos no existe en el destino pero vino empaquetada en _MEIPASS
+                if not target_db.exists() and hasattr(sys, "_MEIPASS"):
+                    bundled_db = Path(sys._MEIPASS) / "data" / "gastos.db"
+                    if bundled_db.exists():
+                        shutil.copy2(bundled_db, target_db)
+                self.db_path = str(target_db)
+                self.init_db()
+                return
             else:
-                base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-                data_dir = os.path.join(base_dir, "data")
-            os.makedirs(data_dir, exist_ok=True)
-            self.db_path = os.path.join(data_dir, "gastos.db")
+                base_dir = Path(__file__).resolve().parent.parent
+                data_dir = base_dir / "data"
+
+            data_dir.mkdir(parents=True, exist_ok=True)
+            self.db_path = str(data_dir / "gastos.db")
         else:
-            self.db_path = db_path
+            self.db_path = str(Path(db_path).resolve())
 
         self.init_db()
 
